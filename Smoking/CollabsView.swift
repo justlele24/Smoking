@@ -19,6 +19,7 @@ struct CollabsView: View {
     @State private var spaceIcons: [String: [String]] = [:]
     
     // Arrays must be @State to be modified
+    // UPDATED: All imageNames now match the Collab names
     @State private var space1: [SpaceMock] = [
         SpaceMock(id: "1-1", name: "Collab 01-01", type: "collab", status: .free, description: "Sunny Side", imageName: "Collab 01-01"),
         SpaceMock(id: "1-2", name: "Collab 01-02", type: "collab", status: .occupied, description: "Meeting", imageName: "Collab 01-02"),
@@ -27,21 +28,21 @@ struct CollabsView: View {
     ]
     
     @State private var space2: [SpaceMock] = [
-        SpaceMock(id: "2-1", name: "Collab 02-01", type: "collab", status: .free, description: "", imageName: "room1"),
-        SpaceMock(id: "2-2", name: "Collab 02-02", type: "collab", status: .occupied, description: "Brainstorming", imageName: "room2"),
-        SpaceMock(id: "2-3", name: "Collab 02-03", type: "collab", status: .free, description: "", imageName: "room3"),
-        SpaceMock(id: "2-4", name: "Collab 02-04", type: "collab", status: .free, description: "", imageName: "room4"),
-        SpaceMock(id: "2-5", name: "Collab 02-05", type: "collab", status: .occupied, description: "Zoom Call", imageName: "room1"),
-        SpaceMock(id: "2-6", name: "Collab 02-06", type: "collab", status: .free, description: "", imageName: "room2"),
+        SpaceMock(id: "2-1", name: "Collab 02-01", type: "collab", status: .free, description: "", imageName: "Collab 02-01"),
+        SpaceMock(id: "2-2", name: "Collab 02-02", type: "collab", status: .occupied, description: "Brainstorming", imageName: "Collab 02-02"),
+        SpaceMock(id: "2-3", name: "Collab 02-03", type: "collab", status: .free, description: "", imageName: "Collab 02-03"),
+        SpaceMock(id: "2-4", name: "Collab 02-04", type: "collab", status: .free, description: "", imageName: "Collab 02-04"),
+        SpaceMock(id: "2-5", name: "Collab 02-05", type: "collab", status: .occupied, description: "Zoom Call", imageName: "Collab 02-05"),
+        SpaceMock(id: "2-6", name: "Collab 02-06", type: "collab", status: .free, description: "", imageName: "Collab 02-06"),
     ]
     
     @State private var space3: [SpaceMock] = [
-        SpaceMock(id: "3-1", name: "Collab 03-01", type: "collab", status: .free, description: "", imageName: "room3"),
-        SpaceMock(id: "3-2", name: "Collab 03-02", type: "collab", status: .occupied, description: "Occupied by John", imageName: "room4"),
-        SpaceMock(id: "3-3", name: "Collab 03-03", type: "collab", status: .free, description: "", imageName: "room1"),
-        SpaceMock(id: "3-4", name: "Collab 03-04", type: "collab", status: .free, description: "", imageName: "room2"),
-        SpaceMock(id: "3-5", name: "Collab 03-05", type: "collab", status: .free, description: "", imageName: "room3"),
-        SpaceMock(id: "3-6", name: "Collab 03-06", type: "collab", status: .occupied, description: "Design Review", imageName: "room4"),
+        SpaceMock(id: "3-1", name: "Collab 03-01", type: "collab", status: .free, description: "", imageName: "Collab 03-01"),
+        SpaceMock(id: "3-2", name: "Collab 03-02", type: "collab", status: .occupied, description: "Occupied by John", imageName: "Collab 03-02"),
+        SpaceMock(id: "3-3", name: "Collab 03-03", type: "collab", status: .free, description: "", imageName: "Collab 03-03"),
+        SpaceMock(id: "3-4", name: "Collab 03-04", type: "collab", status: .free, description: "", imageName: "Collab 03-04"),
+        SpaceMock(id: "3-5", name: "Collab 03-05", type: "collab", status: .free, description: "", imageName: "Collab 03-05"),
+        SpaceMock(id: "3-6", name: "Collab 03-06", type: "collab", status: .occupied, description: "Design Review", imageName: "Collab 03-06"),
     ]
     
     let columns = [

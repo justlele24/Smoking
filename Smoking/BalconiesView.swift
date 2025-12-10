@@ -1,51 +1,42 @@
 import SwiftUI
 
 struct BalconiesView: View {
-    // --- Theme Colors ---
-    let balconyColor1 = Color.green
-    let balconyColor2 = Color.teal
-    let balconyColor3 = Color.mint // Added a 3rd color for Space 3
-    
     // --- States ---
-    @State private var isSection1Expanded: Bool = true
-    @State private var isSection2Expanded: Bool = true
-    @State private var isSection3Expanded: Bool = true
-    
     @State private var selectedSpace: SpaceMock?
     @State private var selectedSpaceColor: Color = .green
     
     // --- Data Storage ---
-    // Store icons separately by ID: [SpaceID: [IconNames]]
     @State private var spaceIcons: [String: [String]] = [:]
-    // Store notes separately by ID
     @State private var spaceNotes: [String: String] = [:]
     
-    // --- Mock Data for Balconies ---
-    // Space 1: Balconies 01-01 to 01-03
-    @State private var balconySpace1: [SpaceMock] = [
-        SpaceMock(id: "b-1-1", name: "Balcony 01-01", type: "balcony", status: .free, description: "Sunny spot", imageName: "balcony1"),
-        SpaceMock(id: "b-1-2", name: "Balcony 01-02", type: "balcony", status: .occupied, description: "Smoking area", imageName: "balcony2"),
-        SpaceMock(id: "b-1-3", name: "Balcony 01-03", type: "balcony", status: .free, description: "Quiet corner", imageName: "balcony3"),
-    ]
-    
-    // Space 2: Balconies 02-01 to 02-03
-    @State private var balconySpace2: [SpaceMock] = [
-        SpaceMock(id: "b-2-1", name: "Balcony 02-01", type: "balcony", status: .free, description: "View of the park", imageName: "balcony1"),
-        SpaceMock(id: "b-2-2", name: "Balcony 02-02", type: "balcony", status: .free, description: "", imageName: "balcony2"),
-        SpaceMock(id: "b-2-3", name: "Balcony 02-03", type: "balcony", status: .occupied, description: "Phone call", imageName: "balcony3"),
-    ]
-    
-    // Space 3: Balconies 03-01 to 03-03
-    @State private var balconySpace3: [SpaceMock] = [
-        SpaceMock(id: "b-3-1", name: "Balcony 03-01", type: "balcony", status: .free, description: "", imageName: "balcony4"),
-        SpaceMock(id: "b-3-2", name: "Balcony 03-02", type: "balcony", status: .free, description: "", imageName: "balcony1"),
-        SpaceMock(id: "b-3-3", name: "Balcony 03-03", type: "balcony", status: .free, description: "", imageName: "balcony2"),
+    // --- Mock Data for Balconies (Unified List) ---
+    // Updated with specific Image Names requested
+    @State private var allBalconies: [SpaceMock] = [
+        SpaceMock(id: "b-l1", name: "Balcony lab 1", type: "balcony", status: .free, description: "Sunny spot", imageName: "Balcony lab 1"),
+        SpaceMock(id: "b-l2-1", name: "First Balcony lab 2", type: "balcony", status: .occupied, description: "Smoking area", imageName: "Balcony lab 2"),
+        SpaceMock(id: "b-l2-2", name: "Second Balcony lab 2", type: "balcony", status: .free, description: "Quiet corner", imageName: "2 Balcony lab 2"),
+        SpaceMock(id: "b-l3", name: "Balcony lab 3", type: "balcony", status: .free, description: "View of the park", imageName: "Balcony lab 3"),
+        SpaceMock(id: "b-s1", name: "Balcony Seminar 1", type: "balcony", status: .free, description: "", imageName: "Balcony Seminar 1"),
+        SpaceMock(id: "b-s2", name: "Balcony Seminar 2", type: "balcony", status: .occupied, description: "Phone call", imageName: "Balcony Seminar 2")
     ]
     
     let columns = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16)
     ]
+    
+    // --- Helper to get specific color for each balcony ---
+    func getBalconyColor(_ id: String) -> Color {
+        switch id {
+        case "b-l1": return .orange       // Balcony lab 1
+        case "b-l2-1": return .yellow     // First Balcony lab 2
+        case "b-l2-2": return .blue       // Second Balcony lab 2
+        case "b-l3": return .blue         // Balcony lab 3
+        case "b-s1": return .red          // Balcony Seminar 1
+        case "b-s2": return .yellow       // Balcony Seminar 2
+        default: return .green            // Fallback
+        }
+    }
     
     var body: some View {
         ScrollView {
@@ -57,62 +48,26 @@ struct BalconiesView: View {
                     .padding(.top, 20)
                     .padding(.horizontal)
                 
-                // Group 1: Space 1
-                DisclosureGroup(isExpanded: $isSection1Expanded) {
+                // SINGLE EXPANDED SECTION
+                VStack(spacing: 12) {
+                    // Static Header
+                    BalconySectionHeader(title: "Academy Balconies", accentColor: .white)
+                        .padding(.horizontal)
+                    
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(balconySpace1) { space in
+                        ForEach(allBalconies) { space in
+                            let specificColor = getBalconyColor(space.id)
+                            
                             Button(action: {
                                 selectedSpace = space
-                                selectedSpaceColor = balconyColor1
+                                selectedSpaceColor = specificColor
                             }) {
-                                BalconySpaceCard(space: space, color: balconyColor1, activeIcons: spaceIcons[space.id] ?? [])
+                                BalconySpaceCard(space: space, color: specificColor, activeIcons: spaceIcons[space.id] ?? [])
                             }
                         }
                     }
-                    .padding(.top, 10)
-                } label: {
-                    BalconySectionHeader(title: "Balconies Space 1", accentColor: balconyColor1)
+                    .padding(.horizontal)
                 }
-                .accentColor(balconyColor1)
-                .padding(.horizontal)
-                
-                // Group 2: Space 2
-                DisclosureGroup(isExpanded: $isSection2Expanded) {
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(balconySpace2) { space in
-                            Button(action: {
-                                selectedSpace = space
-                                selectedSpaceColor = balconyColor2
-                            }) {
-                                BalconySpaceCard(space: space, color: balconyColor2, activeIcons: spaceIcons[space.id] ?? [])
-                            }
-                        }
-                    }
-                    .padding(.top, 10)
-                } label: {
-                    BalconySectionHeader(title: "Balconies Space 2", accentColor: balconyColor2)
-                }
-                .accentColor(balconyColor2)
-                .padding(.horizontal)
-                
-                // Group 3: Space 3
-                DisclosureGroup(isExpanded: $isSection3Expanded) {
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(balconySpace3) { space in
-                            Button(action: {
-                                selectedSpace = space
-                                selectedSpaceColor = balconyColor3
-                            }) {
-                                BalconySpaceCard(space: space, color: balconyColor3, activeIcons: spaceIcons[space.id] ?? [])
-                            }
-                        }
-                    }
-                    .padding(.top, 10)
-                } label: {
-                    BalconySectionHeader(title: "Balconies Space 3", accentColor: balconyColor3)
-                }
-                .accentColor(balconyColor3)
-                .padding(.horizontal)
             }
             .padding(.bottom, 20)
         }
@@ -152,9 +107,7 @@ struct BalconiesView: View {
             }
         }
         
-        updateArray(&balconySpace1)
-        updateArray(&balconySpace2)
-        updateArray(&balconySpace3)
+        updateArray(&allBalconies)
     }
 }
 
@@ -180,7 +133,7 @@ struct BalconyOccupancySheetView: View {
     
     var activeIcons: [String] {
         var icons: [String] = []
-        if isSmoking { icons.append("cigarette") } // Use special key for cigarette
+        if isSmoking { icons.append("cigarette") }
         return icons
     }
     
@@ -254,7 +207,7 @@ struct BalconyOccupancySheetView: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 55)
-                        .background(Color.green) // Green for balconies usually looks good
+                        .background(themeColor) // Match button color to space color
                         .cornerRadius(16)
                 }
                 .padding(.bottom, 20)
@@ -280,9 +233,13 @@ struct BalconyToggleRow: View {
     var body: some View {
         HStack {
             if isCigarette {
-                Text("🚬")
-                    .font(.system(size: 20))
-                    .frame(width: 30)
+                // Use the Custom Asset Image
+                Image("cigarette_icon")
+                    .renderingMode(.template) // Allows us to recolor it
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(isOn ? .green : .gray)
             } else {
                 Image(systemName: icon)
                     .font(.system(size: 20))
@@ -366,8 +323,12 @@ struct BalconySpaceCard: View {
                             ForEach(activeIcons, id: \.self) { icon in
                                 Group {
                                     if icon == "cigarette" {
-                                        Text("🚬")
-                                            .font(.system(size: 10))
+                                        // Use Custom Asset Image
+                                        Image("cigarette_icon")
+                                            .renderingMode(.template)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 14, height: 14)
                                     } else {
                                         Image(systemName: icon)
                                             .font(.system(size: 12))
@@ -375,7 +336,7 @@ struct BalconySpaceCard: View {
                                 }
                                 .foregroundColor(.white)
                                 .padding(4)
-                                .background(Color.red.opacity(0.6)) // Red background for warning style
+                                .background(Color.gray.opacity(0.6))
                                 .clipShape(Circle())
                             }
                         }
