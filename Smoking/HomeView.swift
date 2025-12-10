@@ -11,13 +11,15 @@ struct FeaturedCollab: Identifiable {
 
 struct HomeView: View {
     let featuredSpaces: [FeaturedCollab] = [
-        FeaturedCollab(name: "Collab 3-05", location: "3rd Floor • Near Lab", imageName: "Collab 03-05"),
-        FeaturedCollab(name: "Collab 2-04", location: "2nd Floor • Quiet Zone", imageName: "Collab 03-06"),
-        FeaturedCollab(name: "Balcony Lab 3", location: "Main Hall • Sunny", imageName: "Balcony lab 3"),
-        FeaturedCollab(name: "Collab 4-05", location: "4th Floor • Roof Access", imageName: "room4")
+        FeaturedCollab(name: "Collab 03-05", location: "Free - Near Lab", imageName: "Collab 03-05"),
+        FeaturedCollab(name: "Collab 03-06", location: "Quiet Zone", imageName: "Collab 03-06"),
+        FeaturedCollab(name: "Balcony lab 3", location: "Sunny", imageName: "Balcony lab 3"),
+        FeaturedCollab(name: "Collab 03-01", location: "Calm", imageName: "Collab 03-01")
     ]
     
     @State private var currentIndex: Int = 0
+    // NEW: State to manage the modal presentation
+    @State private var selectedSpace: FeaturedCollab?
     
     var body: some View {
         ScrollView {
@@ -66,18 +68,24 @@ struct HomeView: View {
                                                 .font(.subheadline)
                                                 .foregroundColor(.gray)
                                             
-                                            // NATIVE RESERVE BUTTON
-                                            NavigationLink(destination: ReservationView(spaceName: space.name, spaceImage: space.imageName)) {
-                                                Text("Reserve")
-                                                    .fontWeight(.semibold)
-                                                    .frame(minWidth: 140) // Give it a good tap area
+                                            // NATIVE GLASS BUTTON
+                                            HStack {
+                                                Button(action: {
+                                                    selectedSpace = space
+                                                }) {
+                                                    Text("Explore")
+                                                        .font(.headline)
+                                                        .fontWeight(.semibold)
+                                                        .foregroundColor(.white)
+                                                    // Layout Size
+                                                        .frame(minWidth: 160, minHeight: 50)
+                                                        .glassEffect()
+                                                    
+                                                    // Native Shape
+                                                        .clipShape(Capsule())
+                                                }
+                                                .padding(.top, 10)
                                             }
-                                            .buttonStyle(.borderedProminent) // Native iOS Button Style
-                                            .buttonBorderShape(.capsule)     // Native Capsule Shape
-                                            .controlSize(.large)             // Nice and big
-                                            .tint(.white)                    // White background (Hero style)
-                                            .foregroundColor(.black)         // Black text for contrast
-                                            .padding(.top, 10)
                                         }
                                         .padding(.bottom, 80)
                                     }
@@ -111,9 +119,10 @@ struct HomeView: View {
                     }
                     
                     HStack {
-                        Text("Collabs")
+                        Text("Welcome to shared spaces")
                             .font(.system(size: 34, weight: .bold))
                             .foregroundColor(.white)
+                            .padding()
                         Spacer()
                         
                         // NATIVE QR BUTTON (Glass Effect)
@@ -121,9 +130,10 @@ struct HomeView: View {
                             Image(systemName: "qrcode.viewfinder")
                                 .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(.white)
-                                .padding(10)
-                                .background(.ultraThinMaterial) // Native Frosted Glass
+                                .padding(12)
+                                // Apply Native Material here too
                                 .clipShape(Circle())
+                                .glassEffect()
                         }
                     }
                     .padding(.horizontal)
@@ -154,7 +164,7 @@ struct HomeView: View {
                         HStack(spacing: 15) {
                             ActivityCard(icon: "film.fill", title: "Movie", color: .blue)
                             ActivityCard(icon: "mic.fill", title: "Karaoke", color: .blue)
-                            ActivityCard(icon: "gamecontroller.fill", title: "Gaming", color: .purple)
+                            ActivityCard(icon: "gamecontroller.fill", title: "Gaming", color: .blue)
                         }
                         .padding(.horizontal)
                     }
@@ -166,6 +176,10 @@ struct HomeView: View {
         .edgesIgnoringSafeArea(.top)
         .navigationBarHidden(true)
         .background(Color.black)
+        // 4. PRESENT SHEET WHEN BUTTON IS TAPPED
+        .sheet(item: $selectedSpace) { space in
+            ReservationView(spaceName: space.name, spaceImage: space.imageName)
+        }
     }
 }
 

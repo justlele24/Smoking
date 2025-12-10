@@ -19,11 +19,18 @@ struct MainContainerView: View {
                 HomeView()
             }
             .tabItem {
-                Label("Collabs", systemImage: "sofa.fill")
+                Label("Home", systemImage: "house.fill")
             }
             
+            NavigationView {
+                            CollabsView()
+                        }
+                        .tabItem {
+                            Label("Collabs", systemImage: "sofa.fill")
+                        }
             // Tab 2: Balcony
             NavigationView {
+                BalconiesView()
                 // Placeholder for Balcony View
                 VStack {
                     Text("Balcony View")
@@ -35,7 +42,7 @@ struct MainContainerView: View {
             }
             .tabItem {
                 Label("Balconies", systemImage: "cloud.sun.fill")
-            }
+            }   
         }
         // Optional: Customize Tab Bar Color for Dark Mode
         .accentColor(.blue)

@@ -1,22 +1,15 @@
-//
-//  DetailGridView.swift
-//  Smoking
-//
-//  Created by Raffaele Barra on 03/12/25.
-//
-
-
 import SwiftUI
 
 struct DetailGridView: View {
     @Environment(\.presentationMode) var presentationMode
     
     // Mock Data representing sub-spaces
+    // FIXED: Added 'imageName' to all items to match the updated SpaceMock model
     let spaces: [SpaceMock] = [
-        SpaceMock(id: "1", name: "Collab 03 - 01", type: "collab", status: .free, description: ""),
-        SpaceMock(id: "2", name: "Collab 03 - 02", type: "collab", status: .occupied, description: ""),
-        SpaceMock(id: "3", name: "Collab 03 - 03", type: "collab", status: .free, description: ""),
-        SpaceMock(id: "4", name: "Collab 03 - 04", type: "collab", status: .free, description: ""),
+        SpaceMock(id: "1", name: "Collab 03 - 01", type: "collab", status: .free, description: "", imageName: "room1"),
+        SpaceMock(id: "2", name: "Collab 03 - 02", type: "collab", status: .occupied, description: "", imageName: "room2"),
+        SpaceMock(id: "3", name: "Collab 03 - 03", type: "collab", status: .free, description: "", imageName: "room3"),
+        SpaceMock(id: "4", name: "Collab 03 - 04", type: "collab", status: .free, description: "", imageName: "room4"),
     ]
     
     let columns = [
@@ -64,6 +57,8 @@ struct DetailGridView: View {
             // Grid
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(spaces) { space in
+                    // Note: Ensure SpaceGridCard is NOT defined in this file to avoid redeclaration errors.
+                    // It should only be in SharedComponents.swift.
                     SpaceGridCard(space: space)
                 }
             }

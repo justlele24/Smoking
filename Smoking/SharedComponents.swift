@@ -1,10 +1,3 @@
-//
-//  SharedComponents.swift
-//  Smoking
-//
-//  Created by Raffaele Barra on 03/12/25.
-//
-
 import SwiftUI
 
 // --- Component 1: Space Grid Card (The Red/Green box) ---
@@ -110,7 +103,8 @@ struct SharedComponents_Previews: PreviewProvider {
         ZStack {
             Color.black.edgesIgnoringSafeArea(.all)
             VStack(spacing: 20) {
-                SpaceGridCard(space: SpaceMock(id: "1", name: "Test Room", type: "collab", status: .occupied, description: ""))
+                // FIXED: Added 'imageName' here
+                SpaceGridCard(space: SpaceMock(id: "1", name: "Test Room", type: "collab", status: .occupied, description: "", imageName: "room1"))
                     .frame(width: 160)
                 
                 ActivityCard(icon: "star.fill", title: "Test", color: .blue)
