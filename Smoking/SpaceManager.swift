@@ -6,8 +6,8 @@ class SpaceManager: ObservableObject {
     @Published var selectedTab: Int = 0
     
     // --- MASTER LISTS ---
-    @Published var collabs: [SpaceMock] = []   // Start empty, load from Cloud
-    @Published var balconies: [SpaceMock] = [] // Start empty, load from Cloud
+    @Published var collabs: [SpaceMock] = []
+    @Published var balconies: [SpaceMock] = []
     @Published var spaceIcons: [String: [String]] = [:]
     
     // Auto-refresh timer to sync devices
@@ -44,18 +44,20 @@ class SpaceManager: ObservableObject {
     
     // --- INIT ---
     init() {
-        // Initialize with mocks immediately so UI isn't empty
+        // Initialize with mocks immediately so UI isn't empty on first load
         self.collabs = initialCollabs
         self.balconies = initialBalconies
         
-        // Then try to fetch real data
+        print("🚀 SpaceManager Started")
+        // Load data immediately
         loadFromCloud()
         
         // Start polling every 5 seconds to sync changes from other devices
-        // This ensures Device B sees Device A's updates automatically
         Timer.publish(every: 5.0, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
+                // Only print a dot to indicate heartbeat in console
+                print(".", terminator: "")
                 self?.loadFromCloud()
             }
             .store(in: &cancellables)
@@ -65,16 +67,22 @@ class SpaceManager: ObservableObject {
         CloudKitManager.shared.fetchSpaces { [weak self] fetchedSpaces in
             guard let self = self else { return }
             
-            if fetchedSpaces.isEmpty {
-                // FIRST RUN EVER: Cloud is empty. Seed it!
-                print("Cloud is empty. Seeding initial data...")
-                let allMocks = self.initialCollabs + self.initialBalconies
-                CloudKitManager.shared.seedInitialData(mocks: allMocks)
-            } else {
-                // Cloud has data! Use it.
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                if fetchedSpaces.isEmpty {
+                    // FIRST RUN EVER: Cloud is empty. Seed it!
+                    print("\n☁️ Cloud is empty. Seeding initial data...")
+                    let allMocks = self.initialCollabs + self.initialBalconies
+                    CloudKitManager.shared.seedInitialData(mocks: allMocks)
+                } else {
+                    // Cloud has data! Use it.
+                    // We only log if count changes to avoid spam, or on first load
+                    // print("☁️ Loaded \(fetchedSpaces.count) spaces")
+                    
                     self.collabs = fetchedSpaces.filter { $0.type == "collab" }
                     self.balconies = fetchedSpaces.filter { $0.type == "balcony" }
+                    
+                    // Force UI Refresh
+                    self.objectWillChange.send()
                 }
             }
         }
@@ -83,11 +91,14 @@ class SpaceManager: ObservableObject {
     // --- ACTIONS ---
     
     func updateSpace(id: String, isOccupied: Bool, icons: [String], note: String) {
+        print("\n📝 Updating Space \(id): Occupied=\(isOccupied), Note='\(note)'")
+        
         // 1. Update Local UI immediately (for speed)
         updateLocalState(id: id, isOccupied: isOccupied, icons: icons, note: note)
         
         // 2. Sync to Cloud
-        // We create a temporary object to send to the manager
+        // We create a temporary object to send to the manager.
+        // Note: 'imageName' isn't needed for updateSpaceInCloud if it only updates status/description.
         let tempSpace = SpaceMock(id: id, name: "", type: "", status: isOccupied ? .occupied : .free, description: note, imageName: "")
         CloudKitManager.shared.updateSpaceInCloud(space: tempSpace)
     }
