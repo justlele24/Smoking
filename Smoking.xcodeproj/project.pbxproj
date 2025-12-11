@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A0F0E5D32EEAE36E00706DA1 /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F0E5D22EEAE36E00706DA1 /* CloudKitManager.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		A040B5232ED5B4CD00CCAE82 /* Smoking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Smoking.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0F0E5D22EEAE36E00706DA1 /* CloudKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +37,7 @@
 		A040B51A2ED5B4CD00CCAE82 = {
 			isa = PBXGroup;
 			children = (
+				A0F0E5D22EEAE36E00706DA1 /* CloudKitManager.swift */,
 				A040B5252ED5B4CD00CCAE82 /* Smoking */,
 				A040B5242ED5B4CD00CCAE82 /* Products */,
 			);
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0F0E5D32EEAE36E00706DA1 /* CloudKitManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
