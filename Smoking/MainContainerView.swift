@@ -1,50 +1,49 @@
-//
-//  MainContainerView.swift
-//  Smoking
-//
-//  Created by Raffaele Barra on 03/12/25.
-//
-
-
 import SwiftUI
 
 struct MainContainerView: View {
-    // Standard Native TabView Implementation
-    // No custom init() required to hide things anymore
+    // Access the shared manager
+    @EnvironmentObject var spaceManager: SpaceManager
     
+    init() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+        appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
+        
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+    }
+
     var body: some View {
-        TabView {
-            // Tab 1: Collabs
+        // BINDING: The TabView now reads/writes to the Manager's selectedTab
+        TabView(selection: $spaceManager.selectedTab) {
+            // Tab 0: HOME
             NavigationView {
                 HomeView()
             }
             .tabItem {
                 Label("Home", systemImage: "house.fill")
             }
+            .tag(0)
             
+            // Tab 1: COLLABS
             NavigationView {
-                            CollabsView()
-                        }
-                        .tabItem {
-                            Label("Collabs", systemImage: "sofa.fill")
-                        }
-            // Tab 2: Balcony
+                CollabsView()
+            }
+            .tabItem {
+                Label("Collabs", systemImage: "sofa.fill")
+            }
+            .tag(1)
+            
+            // Tab 2: BALCONIES
             NavigationView {
                 BalconiesView()
-                // Placeholder for Balcony View
-                VStack {
-                    Text("Balcony View")
-                        .font(.largeTitle)
-                        .foregroundColor(.white)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.black)
             }
             .tabItem {
                 Label("Balconies", systemImage: "cloud.sun.fill")
-            }   
+            }
+            .tag(2)
         }
-        // Optional: Customize Tab Bar Color for Dark Mode
         .accentColor(.blue)
     }
 }
@@ -52,6 +51,7 @@ struct MainContainerView: View {
 struct MainContainerView_Previews: PreviewProvider {
     static var previews: some View {
         MainContainerView()
+            .environmentObject(SpaceManager())
             .preferredColorScheme(.dark)
     }
 }

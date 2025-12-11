@@ -1,12 +1,13 @@
 import SwiftUI
 
 struct CollabsView: View {
+    @EnvironmentObject var manager: SpaceManager
+    
     // --- Theme Colors ---
-    let space1Color = Color(red: 0.25, green: 0.88, blue: 0.82) // Turquoise
+    let space1Color = Color(red: 0.25, green: 0.88, blue: 0.82)
     let space2Color = Color.yellow
     let space3Color = Color.orange
     
-    // --- States ---
     @State private var isSpace1Expanded: Bool = true
     @State private var isSpace2Expanded: Bool = true
     @State private var isSpace3Expanded: Bool = true
@@ -14,168 +15,98 @@ struct CollabsView: View {
     @State private var selectedSpace: SpaceMock?
     @State private var selectedSpaceColor: Color = .blue
     
-    // --- Data Storage ---
-    // Store icons separately by ID: [SpaceID: [IconNames]]
-    @State private var spaceIcons: [String: [String]] = [:]
+    // Filtered lists from Manager
+    var space1: [SpaceMock] { manager.collabs.filter { $0.id.hasPrefix("1-") } }
+    var space2: [SpaceMock] { manager.collabs.filter { $0.id.hasPrefix("2-") } }
+    var space3: [SpaceMock] { manager.collabs.filter { $0.id.hasPrefix("3-") } }
     
-    // Arrays must be @State to be modified
-    // UPDATED: All imageNames now match the Collab names
-    @State private var space1: [SpaceMock] = [
-        SpaceMock(id: "1-1", name: "Collab 01-01", type: "collab", status: .free, description: "Sunny Side", imageName: "Collab 01-01"),
-        SpaceMock(id: "1-2", name: "Collab 01-02", type: "collab", status: .occupied, description: "Meeting", imageName: "Collab 01-02"),
-        SpaceMock(id: "1-3", name: "Collab 01-03", type: "collab", status: .free, description: "Quiet", imageName: "Collab 01-03"),
-        SpaceMock(id: "1-4", name: "Collab 01-04", type: "collab", status: .free, description: "Near Entrance", imageName: "Collab 01-04"),
-    ]
-    
-    @State private var space2: [SpaceMock] = [
-        SpaceMock(id: "2-1", name: "Collab 02-01", type: "collab", status: .free, description: "", imageName: "Collab 02-01"),
-        SpaceMock(id: "2-2", name: "Collab 02-02", type: "collab", status: .occupied, description: "Brainstorming", imageName: "Collab 02-02"),
-        SpaceMock(id: "2-3", name: "Collab 02-03", type: "collab", status: .free, description: "", imageName: "Collab 02-03"),
-        SpaceMock(id: "2-4", name: "Collab 02-04", type: "collab", status: .free, description: "", imageName: "Collab 02-04"),
-        SpaceMock(id: "2-5", name: "Collab 02-05", type: "collab", status: .occupied, description: "Zoom Call", imageName: "Collab 02-05"),
-        SpaceMock(id: "2-6", name: "Collab 02-06", type: "collab", status: .free, description: "", imageName: "Collab 02-06"),
-    ]
-    
-    @State private var space3: [SpaceMock] = [
-        SpaceMock(id: "3-1", name: "Collab 03-01", type: "collab", status: .free, description: "", imageName: "Collab 03-01"),
-        SpaceMock(id: "3-2", name: "Collab 03-02", type: "collab", status: .occupied, description: "Occupied by John", imageName: "Collab 03-02"),
-        SpaceMock(id: "3-3", name: "Collab 03-03", type: "collab", status: .free, description: "", imageName: "Collab 03-03"),
-        SpaceMock(id: "3-4", name: "Collab 03-04", type: "collab", status: .free, description: "", imageName: "Collab 03-04"),
-        SpaceMock(id: "3-5", name: "Collab 03-05", type: "collab", status: .free, description: "", imageName: "Collab 03-05"),
-        SpaceMock(id: "3-6", name: "Collab 03-06", type: "collab", status: .occupied, description: "Design Review", imageName: "Collab 03-06"),
-    ]
-    
-    let columns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
+    let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                
-                Text("Collabs")
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundColor(.white)
-                    .padding(.top, 20)
-                    .padding(.horizontal)
+                Text("Collabs").font(.system(size: 34, weight: .bold)).foregroundColor(.white).padding(.top, 20).padding(.horizontal)
                 
                 // Group 1
                 DisclosureGroup(isExpanded: $isSpace1Expanded) {
                     LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(space1) { space in
-                            Button(action: {
-                                selectedSpace = space
-                                selectedSpaceColor = space1Color
-                            }) {
-                                ColoredSpaceCard(space: space, color: space1Color, activeIcons: spaceIcons[space.id] ?? [])
+                            Button(action: { selectedSpace = space; selectedSpaceColor = space1Color }) {
+                                ColoredSpaceCard(space: space, color: space1Color, activeIcons: manager.getIcons(for: space.id))
                             }
                         }
                     }
                     .padding(.top, 10)
-                } label: {
-                    SectionHeader(title: "Collaborative Space 1", accentColor: space1Color)
-                }
-                .accentColor(space1Color)
-                .padding(.horizontal)
+                } label: { SectionHeader(title: "Collaborative Space 1", accentColor: space1Color) }
+                .accentColor(space1Color).padding(.horizontal)
                 
                 // Group 2
                 DisclosureGroup(isExpanded: $isSpace2Expanded) {
                     LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(space2) { space in
-                            Button(action: {
-                                selectedSpace = space
-                                selectedSpaceColor = space2Color
-                            }) {
-                                ColoredSpaceCard(space: space, color: space2Color, activeIcons: spaceIcons[space.id] ?? [])
+                            Button(action: { selectedSpace = space; selectedSpaceColor = space2Color }) {
+                                ColoredSpaceCard(space: space, color: space2Color, activeIcons: manager.getIcons(for: space.id))
                             }
                         }
                     }
                     .padding(.top, 10)
-                } label: {
-                    SectionHeader(title: "Collaborative Space 2", accentColor: space2Color)
-                }
-                .accentColor(space2Color)
-                .padding(.horizontal)
+                } label: { SectionHeader(title: "Collaborative Space 2", accentColor: space2Color) }
+                .accentColor(space2Color).padding(.horizontal)
                 
                 // Group 3
                 DisclosureGroup(isExpanded: $isSpace3Expanded) {
                     LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(space3) { space in
-                            Button(action: {
-                                selectedSpace = space
-                                selectedSpaceColor = space3Color
-                            }) {
-                                ColoredSpaceCard(space: space, color: space3Color, activeIcons: spaceIcons[space.id] ?? [])
+                            Button(action: { selectedSpace = space; selectedSpaceColor = space3Color }) {
+                                ColoredSpaceCard(space: space, color: space3Color, activeIcons: manager.getIcons(for: space.id))
                             }
                         }
                     }
                     .padding(.top, 10)
-                } label: {
-                    SectionHeader(title: "Collaborative Space 3", accentColor: space3Color)
-                }
-                .accentColor(space3Color)
-                .padding(.horizontal)
+                } label: { SectionHeader(title: "Collaborative Space 3", accentColor: space3Color) }
+                .accentColor(space3Color).padding(.horizontal)
             }
             .padding(.bottom, 20)
         }
-        .background(Color.black)
-        .navigationBarHidden(true)
-        // --- THE POP-OVER SHEET ---
+        .background(Color.black).navigationBarHidden(true)
         .sheet(item: $selectedSpace) { space in
             OccupancySheetView(
                 space: space,
                 themeColor: selectedSpaceColor,
-                // Pass current icons so sheet knows its state
-                currentIcons: spaceIcons[space.id] ?? [],
-                onConfirm: { isOccupied, icons in
-                    updateSpace(id: space.id, isOccupied: isOccupied, icons: icons)
+                currentIcons: manager.getIcons(for: space.id),
+                currentNote: space.description,
+                onConfirm: { isOccupied, icons, note in
+                    manager.updateSpace(id: space.id, isOccupied: isOccupied, icons: icons, note: note)
                 }
             )
         }
     }
-    
-    // Logic to find and update the space in the correct array
-    func updateSpace(id: String, isOccupied: Bool, icons: [String]) {
-        // Update Icons Map
-        spaceIcons[id] = icons
-        
-        // Helper to update array
-        func updateArray(_ arr: inout [SpaceMock]) {
-            if let index = arr.firstIndex(where: { $0.id == id }) {
-                let old = arr[index]
-                let newStatus: SpaceStatus = isOccupied ? .occupied : .free
-                // Create new copy with updated status
-                let newSpace = SpaceMock(id: old.id, name: old.name, type: old.type, status: newStatus, description: old.description, imageName: old.imageName)
-                arr[index] = newSpace
-            }
-        }
-        
-        updateArray(&space1)
-        updateArray(&space2)
-        updateArray(&space3)
-    }
 }
 
-// --- NEW VIEW: THE POP-OVER FORM ---
+// ... OccupancySheetView and other helpers remain exactly the same as previous version ...
+// (I am omitting the long helper code here to save space, but you should keep the exact same Sheet, ToggleRows, Cards, etc. from the previous successful iteration, just ensure the sheet connects to manager actions as shown above)
+
+// (Include rest of the file content from previous CollabsView.swift, ensuring ColoredSpaceCard etc are present)
+// For completeness of the file block, I will include the critical components:
+
 struct OccupancySheetView: View {
     let space: SpaceMock
     let themeColor: Color
-    let currentIcons: [String] // Receive previously saved icons
-    var onConfirm: (Bool, [String]) -> Void // Callback to save changes
+    let currentIcons: [String]
+    let currentNote: String
+    var onConfirm: (Bool, [String], String) -> Void
     
     @Environment(\.presentationMode) var presentationMode
     
-    // Toggles State
     @State private var isInSpace = false
     @State private var isListeningToMusic = false
     @State private var isWatchingMovie = false
     @State private var isPlayingInstrument = false
+    @State private var notes: String = ""
     
-    // Computed property to create a temporary "Preview" space object
     var previewSpace: SpaceMock {
         let status: SpaceStatus = isInSpace ? .occupied : space.status
-        return SpaceMock(id: space.id, name: space.name, type: space.type, status: status, description: space.description, imageName: space.imageName)
+        return SpaceMock(id: space.id, name: space.name, type: space.type, status: status, description: notes, imageName: space.imageName)
     }
     
     var activeIcons: [String] {
@@ -187,198 +118,163 @@ struct OccupancySheetView: View {
     }
     
     var body: some View {
-        ZStack {
-            Color(UIColor.systemBackground).edgesIgnoringSafeArea(.all)
-            
-            VStack(alignment: .leading, spacing: 24) {
+        NavigationView {
+            ZStack {
+                Color(UIColor.systemBackground).edgesIgnoringSafeArea(.all)
                 
-                // --- CLOSE BUTTON ---
-                HStack {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Card Preview").font(.caption).foregroundColor(.gray).padding(.bottom, -15).padding(.top, 10)
+                    
+                    ColoredSpaceCard(space: previewSpace, color: themeColor, activeIcons: activeIcons, showArrow: false)
+                    
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 24) {
+                            ToggleRow(title: "Are you in this space?", isOn: $isInSpace, icon: "person.fill")
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Activity").font(.caption).foregroundColor(.secondary).padding(.leading, 8)
+                                VStack(spacing: 0) {
+                                    CompactToggleRow(title: "Listening to music?", isOn: $isListeningToMusic, icon: "music.note", showDivider: true)
+                                    CompactToggleRow(title: "Watching a movie?", isOn: $isWatchingMovie, icon: "film", showDivider: true)
+                                    CompactToggleRow(title: "Playing an instrument?", isOn: $isPlayingInstrument, icon: "guitars", showDivider: false)
+                                }
+                                .background(Color(UIColor.secondarySystemBackground)).cornerRadius(12)
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Notes").font(.caption).foregroundColor(.secondary).padding(.leading, 8)
+                                TextField("e.g. Taking a break...", text: $notes).padding().background(Color(UIColor.secondarySystemBackground)).cornerRadius(12)
+                            }
+                        }
+                        .padding(.top, 20)
+                    }
+                    
                     Spacer()
-                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.secondary)
-                            .padding(8)
-                            .background(Color.secondary.opacity(0.2))
-                            .clipShape(Circle())
+                    
+                    Button(action: {
+                        onConfirm(isInSpace, activeIcons, notes)
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text("Confirm Occupation").font(.headline).fontWeight(.bold).foregroundColor(.white).frame(maxWidth: .infinity).frame(height: 55).background(.ultraThinMaterial).background(themeColor.opacity(0.8)).cornerRadius(16)
                     }
+                    .padding(.bottom, 20)
                 }
-                .padding(.top, 20)
-                
-                // --- PREVIEW OF THE CARD ---
-                Text("Card Preview")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                    .padding(.bottom, -15)
-                
-                ColoredSpaceCard(
-                    space: previewSpace,
-                    color: themeColor,
-                    activeIcons: activeIcons
-                )
-                
-                Divider()
-                
-                // Questions / Toggles
-                ScrollView {
-                    VStack(spacing: 20) {
-                        ToggleRow(title: "Are you in this space?", isOn: $isInSpace, icon: "person.fill")
-                        ToggleRow(title: "Listening to music?", isOn: $isListeningToMusic, icon: "music.note")
-                        ToggleRow(title: "Watching a movie?", isOn: $isWatchingMovie, icon: "film")
-                        ToggleRow(title: "Playing an instrument?", isOn: $isPlayingInstrument, icon: "guitars")
-                    }
-                }
-                
-                Spacer()
-                
-                // Confirm Button
-                Button(action: {
-                    // Send data back to main view
-                    onConfirm(isInSpace, activeIcons)
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Text("Confirm Occupation")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 55)
-                        .background(Color.blue)
-                        .cornerRadius(16)
-                }
-                .padding(.bottom, 20)
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                        Image(systemName: "xmark").symbolRenderingMode(.hierarchical)
+                            .bold()
+                    }
+                }
+            }
         }
         .onAppear {
-            // SYNC TOGGLES WITH SAVED STATE
             isInSpace = (space.status == .occupied)
             isListeningToMusic = currentIcons.contains("music.note")
             isWatchingMovie = currentIcons.contains("film")
             isPlayingInstrument = currentIcons.contains("guitars")
+            notes = currentNote
         }
     }
 }
 
-// Helper for the Toggle Rows
+// (Include CompactToggleRow, ToggleRow, SectionHeader, ColoredSpaceCard from previous context here)
+struct CompactToggleRow: View {
+    let title: String
+    @Binding var isOn: Bool
+    let icon: String
+    let showDivider: Bool
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Image(systemName: icon).font(.system(size: 18)).foregroundColor(.blue).frame(width: 24)
+                Text(title).font(.subheadline).fontWeight(.medium)
+                Spacer()
+                Toggle("", isOn: $isOn).labelsHidden()
+            }
+            .padding(.horizontal, 16).padding(.vertical, 10)
+            if showDivider { Divider().padding(.leading, 56) }
+        }
+    }
+}
+
 struct ToggleRow: View {
     let title: String
     @Binding var isOn: Bool
     let icon: String
-    
     var body: some View {
         HStack {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(.blue)
-                .frame(width: 30)
-            
-            Text(title)
-                .font(.headline)
-            
+            Image(systemName: icon).font(.system(size: 20)).foregroundColor(.blue).frame(width: 30)
+            Text(title).font(.headline)
             Spacer()
-            
-            Toggle("", isOn: $isOn)
-                .labelsHidden() // Hides the default text label since we made our own
+            Toggle("", isOn: $isOn).labelsHidden()
         }
-        .padding()
-        .background(Color(UIColor.secondarySystemBackground))
-        .cornerRadius(12)
+        .padding().background(Color(UIColor.secondarySystemBackground)).cornerRadius(12)
     }
 }
 
-// ... SectionHeader remains same ...
 struct SectionHeader: View {
     let title: String
     let accentColor: Color
-    
     var body: some View {
         HStack(spacing: 12) {
             Capsule().fill(accentColor).frame(width: 4, height: 24)
             Text(title).font(.title3).fontWeight(.bold).foregroundColor(accentColor).textCase(.uppercase)
             Spacer()
         }
-        .padding(.vertical, 8)
-        .background(Color.black)
+        .padding(.vertical, 8).background(Color.black)
     }
 }
 
-// --- UPDATED CARD TO SUPPORT ICONS ON TOP ---
 struct ColoredSpaceCard: View {
     let space: SpaceMock
     let color: Color
-    // New Optional Parameter for icons
     var activeIcons: [String] = []
-    
+    var showArrow: Bool = true
     var isOccupied: Bool { space.status == .occupied }
     
     var body: some View {
         ZStack {
-            // --- BACKGROUND IMAGE ---
-            Image(space.imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(height: 130)
-                .clipped()
-                .opacity(0.4) // Soft image background
+            Image(space.imageName).resizable().scaledToFill().frame(height: 130).clipped().opacity(0.4)
+            Color.black.opacity(0.4)
+            color.opacity(0.1)
             
-            // --- CARD CONTENT ---
             VStack(alignment: .leading) {
                 HStack {
-                    // Status Dot
-                    Circle()
-                        .fill(isOccupied ? Color.red : Color.green)
-                        .frame(width: 12, height: 12)
-                        .shadow(color: isOccupied ? Color.red.opacity(0.6) : Color.green.opacity(0.6), radius: 4)
+                    Circle().fill(isOccupied ? Color.red : Color.green).frame(width: 12, height: 12).shadow(color: isOccupied ? Color.red.opacity(0.6) : Color.green.opacity(0.6), radius: 4)
                     Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(6)
-                        .overlay(Circle().stroke(Color.white.opacity(0.3), lineWidth: 1))
+                    if showArrow {
+                        Image(systemName: "chevron.right").font(.system(size: 14, weight: .bold)).foregroundColor(.white).padding(6).overlay(Circle().stroke(Color.white.opacity(0.3), lineWidth: 1))
+                    }
                 }
-                
                 Spacer()
-                
-                // Name + Icons (Now vertically stacked)
                 VStack(alignment: .leading, spacing: 8) {
-                    // Display Icons on top
                     if !activeIcons.isEmpty {
                         HStack(spacing: 4) {
                             ForEach(activeIcons, id: \.self) { icon in
-                                Image(systemName: icon)
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.white)
-                                    .padding(4)
-                                    .background(Color.white.opacity(0.2))
-                                    .clipShape(Circle())
+                                Image(systemName: icon).font(.system(size: 10)).foregroundColor(.white).padding(4).background(Color.white.opacity(0.2)).clipShape(Circle())
                             }
                         }
                     }
-                    
-                    // Name below icons
-                    Text(space.name)
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
-                        .lineLimit(1)
+                    Text(space.name).font(.system(size: 16, weight: .bold)).foregroundColor(.white).lineLimit(1)
+                    if !space.description.isEmpty {
+                        Text(space.description).font(.caption).foregroundColor(.white.opacity(0.8)).lineLimit(1)
+                    }
                 }
             }
             .padding(16)
         }
-        .frame(height: 130) // Increased height slightly for new layout
-        // Remove the solid color background
-        // .background(color.opacity(0.15))
-        .background(Color.black.opacity(0.5)) // Add a dark overlay for readability
-        .cornerRadius(20)
-        // BORDER changes to RED if occupied
+        .frame(height: 130)
+        .background(Color.black.opacity(0.5)).cornerRadius(20)
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(isOccupied ? Color.red : color.opacity(0.5), lineWidth: isOccupied ? 2 : 1))
     }
 }
 
 struct CollabsView_Previews: PreviewProvider {
     static var previews: some View {
-        CollabsView()
-            .preferredColorScheme(.dark)
+        CollabsView().environmentObject(SpaceManager()).preferredColorScheme(.dark)
     }
 }
